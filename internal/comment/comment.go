@@ -22,21 +22,21 @@ type CommentService interface {
 func NewService(db *gorm.DB) *Service{
 	return &Service{DB:db}
 }
-func (s *Service) GetComment(ID uint)(Comment,error)  {
+func (s *Service) GetComment(ID uint) (Comment, error) {
 	var comment Comment
-	if result := s.DB.First(&comment,ID);result.Error != nil{
-		return Comment{},result.Error
+	if result := s.DB.First(&comment, ID); result.Error != nil {
+		return Comment{}, result.Error
 	}
-	return comment,nil
-	
+	return comment, nil
 }
 
-func(s *Service) GetCommentsBySlug(slug string)([]Comment,error){
+
+func (s *Service) GetCommentsBySlug(slug string) ([]Comment, error) {
 	var comments []Comment
-	if result := s.DB.First(&comments).Where("slug = ?",slug);result.Error != nil{
-		return []Comment{},result.Error
+	if result := s.DB.Find(&comments).Where("slug = ?", slug); result.Error != nil {
+		return []Comment{}, result.Error
 	}
-	return comments,nil
+	return comments, nil
 }
 func (s *Service) PostComment(comment Comment) (Comment, error) {
 	if result := s.DB.Save(&comment); result.Error != nil {
@@ -45,26 +45,28 @@ func (s *Service) PostComment(comment Comment) (Comment, error) {
 	return comment, nil
 }
 
-func (s *Service)UpdateComment(ID uint, newcomment Comment)(Comment, error){
 
+func (s *Service) UpdateComment(ID uint, newComment Comment) (Comment, error) {
 	comment, err := s.GetComment(ID)
-	if err != nil{
+	if err != nil {
 		return Comment{}, err
 	}
-	if result := s.DB.Model(&comment).Updates(newcomment);result.Error != nil{
+
+	if result := s.DB.Model(&comment).Updates(newComment); result.Error != nil {
 		return Comment{}, result.Error
 	}
+
 	return comment, nil
 }
-func(s *Service)DeleteComment(ID uint) error{
-	if result := s.DB.Delete(&Comment{},ID);result.Error != nil{
+func (s *Service) DeleteComment(ID uint) error {
+	if result := s.DB.Delete(&Comment{}, ID); result.Error != nil {
 		return result.Error
 	}
 	return nil
 }
 func (s *Service)GetAllComments()([]Comment, error){
 	var comments []Comment
-	if result := s.DB.Find(comments);result.Error != nil{
+	if result := s.DB.Find(&comments);result.Error != nil{
 		return []Comment{},result.Error
 	}
 	return comments,nil
